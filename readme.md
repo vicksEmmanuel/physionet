@@ -8,7 +8,7 @@ Videos are preprocessed and converted to prompt such as this
 `
 
 ##### Prompt that contains all the frames for the specific action and the action
-`<frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <action>shoulder examination<action> <|endoftext|>
+`<frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <frame> <action>shoulder examination<action> <|endoftext|>
 `
 
 ##### Prompt that takes all the actions and the final label
