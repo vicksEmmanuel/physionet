@@ -149,10 +149,4 @@ MultimodalTrainer(
 
 ## Results
 
-![Inferencing](https://res.cloudinary.com/vickie/image/upload/v1736124754/o7hrjf0skj1i6ucxbyk9.png)
-
-
-
-## Video
-
-![Video](https://res.cloudinary.com/vickie/video/upload/v1736124797/l57g9nn8mwsgllnopgb0.mp4)
+![Inferencing](https://res.cloudinary.com/vickie/image/upload/v1736125606/iytnitvxicozrqzkvsgs.gif)
