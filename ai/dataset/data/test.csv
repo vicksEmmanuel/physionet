@@ -1,0 +1,3 @@
+file_path,annotation_path,value,additional_info
+dataset/data/videos/Physiotherapy Actions Detection_ds0_Postural Analysis Anterior.mp4,dataset/data/annotations/Physiotherapy Actions Detection_ds0_Postural Analysis Anterior.mp4.json,Good. anterior analysis,Will not be used in training
+dataset/data/videos/Physiotherapy Actions Detection_ds0_Video 1 - postural assessment video.mp4,dataset/data/annotations/Physiotherapy Actions Detection_ds0_Video 1 - postural assessment video.mp4.json,Good. postural assessment video,Will not be used in training

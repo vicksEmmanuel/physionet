@@ -1,0 +1,32 @@
+# Deep Learning Framework
+torch
+torchvision
+pytorch-lightning
+
+# Data Processing
+opencv-python
+numpy
+pandas
+Pillow
+
+# Optional but recommended for better performance
+albumentations
+pytorchvideo
+transformers
+PyYAML
+
+xformers==0.0.28.post3
+trl
+peft 
+accelerate 
+bitsandbytes
+unsloth==2024.11.7
+tensorflow
+wandb
+tf-keras
+unsloth-zoo
+gradio
+kagglehub
+httpx[socks]
+bert-score
+scikit-learn

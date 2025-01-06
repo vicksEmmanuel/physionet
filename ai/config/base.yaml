@@ -1,0 +1,70 @@
+# @format
+
+# Basic project settings
+wandb_project: physionet
+
+vit_model_name: google/siglip-base-patch16-224
+tokenizer: gpt2
+
+# Data paths and processing
+train_csv_path: dataset/data/train.csv
+test_csv_path: dataset/data/test.csv
+val_csv_path: dataset/data/val.csv
+# model_path: None
+model_path: "/home/featurize/work/physionet/ai/checkpoints/physiotherapy-epoch=55-val_loss=1.43.ckpt"
+model_folder: cache
+checkpoints: checkpoints
+
+# Data loading parameters
+batch_size: 8
+num_workers: 0
+resolution: 224
+train_val_split: 0.8
+max_seq_length: 2048
+
+# file_index: 0
+file_index: 0
+
+# Training hyperparameters
+learning_rate: 2e-5
+max_epochs: 100
+accumulate_grad_batches: 4
+warmup_steps: 10  # New: Number of warmup steps for learning rate scheduler
+weight_decay: 0.01  # New: Weight decay for AdamW optimizer
+gradient_checkpointing: true  # New: Enable gradient checkpointing to save memory
+max_grad_norm: 1.0  # New: Maximum gradient norm for clipping
+
+
+# Hardware and precision settings
+device: gpu
+gpus: 1
+precision: bf16-mixed
+seed: 42  # New: Random seed for reproducibility
+
+# Logging and evaluation
+log_every_n_steps: 5
+val_check_interval: 0.25
+eval_steps: 100  # New: How often to run evaluation
+save_steps: 100  # New: How often to save checkpoints
+save_total_limit: 3  # New: Maximum number of checkpoints to keep
+logging_strategy: "steps"  # New: When to log (steps, epoch)
+evaluation_strategy: "steps"  # New: When to evaluate (steps, epoch)
+
+# Optimization settings
+lr_scheduler_type: "cosine"  # New: Type of learning rate scheduler
+warmup_ratio: 0.1  # New: Ratio of warmup steps to total steps
+gradient_accumulation_steps: 4  # New: Same as accumulate_grad_batches
+per_device_train_batch_size: 3  # New: Same as batch_size
+per_device_eval_batch_size: 3  # New: Batch size for evaluation
+remove_unused_columns: false  # New: Keep all columns in dataset
+
+
+# Advanced training settings
+ddp_find_unused_parameters: false  # New: For distributed training
+report_to: "wandb"  # New: Logging platform
+load_best_model_at_end: true  # New: Load best model after training
+metric_for_best_model: "eval_loss"  # New: Metric to track for best model
+greater_is_better: false  # New: Lower loss is better
+full_determinism: false  # New: Enable full determinism (might slow training)
+dataloader_num_workers: 0  # New: Same as num_workers
+dataloader_pin_memory: true  # New: Pin memory for faster data transfer
