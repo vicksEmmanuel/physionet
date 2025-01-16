@@ -30,7 +30,6 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 import tqdm
 
 
-
 class PhysiotherapyPaligemmaConfig:
     def __init__(self, config_path):
         with open(config_path, 'r') as f:
@@ -49,6 +48,10 @@ class PhysiotherapyPaligemmaConfig:
 
     def inference(self, config_path, video_path, output_video_path):
         return self.physionet.inference(config_path=config_path, video_path=video_path, output_video_path = output_video_path)
+
+    def inference_processed(self, config_path, video_path, output_video_path):
+        return self.physionet.inference_processed(config_path=config_path, video_path=video_path, output_video_path = output_video_path)
+
 
 
 class PhysiotherapyPaligemma:
@@ -317,6 +320,7 @@ class PhysiotherapyPaligemma:
         eval(dataloader=test_loader, stage="test")
 
 
+
     def inference(self, config_path: str, video_path: str, output_video_path: str):
         """
         Perform inference on a video using a trained multimodal model.
@@ -335,13 +339,13 @@ class PhysiotherapyPaligemma:
 
         config = config["model"]
         # Set up model
-        model_path = config.get("output_dir")
+        model_path = config.get("inference_model")
         if not model_path:
             raise ValueError("Model path not specified in config")
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        model_id = f"{model_path}/fine_tuned_paligemma"
+        model_id = f"{model_path}"
         model = PaliGemmaForConditionalGeneration.from_pretrained(model_id).to(device)  # Move model to device
         processor = AutoProcessor.from_pretrained(model_id)
 
@@ -372,6 +376,9 @@ class PhysiotherapyPaligemma:
         # List to store frame-by-frame actions for detailed analysis
         frame_actions = []
 
+        # Counter to skip frames
+        skip_counter = 0
+
         while True:
             ret, frame = cap.read()
             if not ret:
@@ -379,8 +386,13 @@ class PhysiotherapyPaligemma:
 
             frame_count += 1
 
-            if frame_count == 500:
-                break
+            # Skip frames until the 30th frame
+            if skip_counter < 30:
+                skip_counter += 1
+                continue
+
+            # Reset skip counter after processing the 30th frame
+            skip_counter = 0
 
             # Preprocess frame
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -388,14 +400,6 @@ class PhysiotherapyPaligemma:
             tensor_frame = pil_frame
 
             drawing_frame = frame_rgb
-
-            transform = transforms.Compose([
-                transforms.Resize((224, 224)),  # Resize image to a fixed size
-                transforms.ToTensor(),          # Convert image to tensor
-            ])
-
-            if isinstance(tensor_frame, Image.Image):
-                tensor_frame = transform(tensor_frame).to(device)  # Move tensor to device
 
             list_of_actions = [
                 "pelvis check", "demonstrating to the patient", "accessing the back of the patient",
@@ -405,7 +409,7 @@ class PhysiotherapyPaligemma:
                 "hands examination", "walking", "patient standing up"
             ]
 
-            prompts = "<image> detect"
+            prompts = "<image> " + " ".join([f"detect {i};" for i in list_of_actions])
 
             # Process inputs with proper padding and truncation
             inputs = processor(
@@ -420,8 +424,8 @@ class PhysiotherapyPaligemma:
 
             output = model.generate(
                 **inputs,
-                temperature=0.7,  # Lower temperature makes output more focused/deterministic
-                top_p=0.9,  # Nucleus sampling threshold - only consider tokens with cumulative probability > 0.9
+                temperature=0.2,  # Lower temperature makes output more focused/deterministic
+                top_p=0.7,  # Nucleus sampling threshold - only consider tokens with cumulative probability > 0.9
                 do_sample=True,  # Enable sampling (required for temperature and top_p to take effect)
                 max_new_tokens=20
             )
@@ -498,10 +502,68 @@ class PhysiotherapyPaligemma:
 
         decoded_output = processor.decode(output[0], skip_special_tokens=True)
 
+        with open(f'{output_video_path}.txt', 'w') as f:
+            f.write(video_path + " ======>>> "+ str(decoded_output).replace(action_summary, ""))
+
         return {
             "text": str(decoded_output).replace(action_summary, ""),
             "video_path": output_video_path
         }
+
+    def inference_processed(self, config_path: str, video_path: str, output_video_path: str):
+        """
+        Perform inference on a video using a trained multimodal model.
+        
+        Args:
+            config_path (str): Path to the configuration YAML file
+            video_path (str): Path to the input video file
+            output_video_path (str): Path to save the output video with bounding boxes
+        
+        Returns:
+            list: List of model outputs for each frame
+        """
+        
+        # Get the directory containing output_video_path
+        import os
+        output_dir = os.path.dirname(output_video_path)
+        
+        # Walk through all files in the directory
+        for root, dirs, files in os.walk(output_dir):
+            # Filter only txt files
+            txt_files = [f for f in files if f.endswith('.txt')]
+            
+            for txt_file in txt_files:
+                txt_path = os.path.join(root, txt_file)
+                
+                try:
+                    # Read content of each txt file
+                    with open(txt_path, 'r') as f:
+                        content = f.read().strip()
+                    
+                    splitter = " ======>>> "
+                    # Split by the delimiter and take first part
+                    if splitter in content:
+                        stored_path = content.split(splitter, 1)[0].strip()
+                        result = content.split(splitter, 1)[1].strip()
+                        
+                        # Compare with current output_video_path
+                        if stored_path == video_path:
+                            # Found matching path, write to output_video_path.txt
+                           
+                                
+                            return {
+                                "text": result,
+                                "video_path": txt_path.replace("txt","")
+                            }
+                except Exception as e:
+                    print(f"Error reading file {txt_path}: {str(e)}")
+                    continue
+
+        return {
+            "text": "",
+            "video_path": ""
+        }
+
 
     def calculate_detection_accuracy(self, predicted_boxes_actions, ground_truth_boxes_actions):
         """

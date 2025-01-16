@@ -2,7 +2,6 @@ import numpy as np
 from utils.types import DatasetItem, PreprocessedDatasetItem, PreprocessedPaligemmaDatasetItem
 import torch
 from PIL import Image
-from torchvision import transforms
 
 
 class Preprocessor:

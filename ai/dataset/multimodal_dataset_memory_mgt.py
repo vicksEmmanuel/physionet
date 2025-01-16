@@ -82,8 +82,8 @@ class MultimodalMemoryManagementDataset(Dataset):
                     frame = Image.fromarray(frame)
                     
                     # Apply transforms if provided
-                    if self.transform is not None:
-                        frame = self.transform(frame)
+                    # if self.transform is not None:
+                    #     frame = self.transform(frame)
                     
                     frames.append(frame)
                     frame_indices.append(current_idx)
