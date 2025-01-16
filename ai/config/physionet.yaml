@@ -2,7 +2,7 @@ dataset:
   train_csv_path: dataset/data/train.csv
   test_csv_path: dataset/data/test.csv
   val_csv_path: dataset/data/val.csv
-  batch_size: 1
+  batch_size: 4
   num_workers: 0
   resolution: 224
   train_val_split: 0.8
